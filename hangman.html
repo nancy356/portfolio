@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Panda Scroll — Biology Hangman</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /*══════════════════════════════════════════
+      ROOT
+    ══════════════════════════════════════════*/
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --ink:#140c00;
+      --p:#f7edd5;
+      --pd:#ecdbb8;
+      --gold:#c9922a;
+      --glt:#f0c060;
+      --red:#8b1a0a;
+      --rlt:#c0392b;
+      --jade:#2d6a4f;
+      --jlt:#52b788;
+      --bamboo:#3a6b1c;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Crimson Pro',Georgia,serif;
+      background:var(--ink);
+      color:var(--ink);
+      min-height:100vh;
+      overflow-x:hidden;
+      cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='3' fill='%23c9922a' opacity='.9'/%3E%3C/svg%3E") 8 8,pointer;
+    }
+
+    /*══════════════════════════════════════════
+      STAGE
+    ══════════════════════════════════════════*/
+    .stage{
+      min-height:100vh;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;
+      padding:2.5rem 1rem 5rem;
+      position:relative;overflow:hidden;
+    }
+
+    /* rings */
+    .ring{
+      position:fixed;border-radius:50%;
+      border:1px solid rgba(201,146,42,.09);
+      pointer-events:none;
+      top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      animation:breathe 12s ease-in-out infinite;
+    }
+    .ring:nth-child(1){width:460px;height:460px;}
+    .ring:nth-child(2){width:780px;height:780px;animation-delay:-4s;}
+    .ring:nth-child(3){width:1100px;height:1100px;animation-delay:-8s;}
+    @keyframes breathe{
+      0%,100%{opacity:.8;transform:translate(-50%,-50%) scale(1);}
+      50%{opacity:.3;transform:translate(-50%,-50%) scale(1.03);}
+    }
+
+    /* bamboo */
+    .bam{
+      position:fixed;bottom:0;width:13px;
+      background:linear-gradient(to top,#1b360e,var(--bamboo),#1b360e);
+      border-radius:2px 2px 0 0;opacity:.18;pointer-events:none;
+    }
+    .bam::before,.bam::after{
+      content:'';position:absolute;left:-9px;width:31px;height:6px;
+      background:inherit;border-radius:3px;opacity:.6;
+    }
+    .bam::before{top:30%;}.bam::after{top:62%;}
+    .bam:nth-child(4){left:2%;height:55vh;animation:sw 7s ease-in-out infinite;}
+    .bam:nth-child(5){left:5%;height:70vh;animation:sw 9s ease-in-out infinite reverse;width:10px;}
+    .bam:nth-child(6){right:3%;height:60vh;animation:sw 8s ease-in-out infinite;}
+    .bam:nth-child(7){right:6%;height:48vh;animation:sw 11s ease-in-out infinite reverse;width:10px;}
+    @keyframes sw{0%,100%{transform:rotate(-1.3deg);}50%{transform:rotate(1.7deg);}}
+
+    /*══════════════════════════════════════════
+      NAV BAR
+    ══════════════════════════════════════════*/
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:.85rem 2.5rem;
+      background:rgba(20,12,0,.94);
+      backdrop-filter:blur(8px);
+      border-bottom:1.5px solid var(--gold);
+    }
+    .nav-logo{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.95rem;color:var(--gold);
+      text-decoration:none;letter-spacing:.05em;
+    }
+    .nav-logo span{color:var(--p);}
+    nav ul{list-style:none;display:flex;gap:2rem;}
+    nav ul a{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.6rem;color:var(--p);
+      text-decoration:none;letter-spacing:.15em;
+      transition:color .25s;
+    }
+    nav ul a:hover,nav ul a.active{color:var(--gold);}
+
+    /*══════════════════════════════════════════
+      MAIN PANEL
+    ══════════════════════════════════════════*/
+    .panel{
+      position:relative;z-index:10;
+      background:var(--p);
+      max-width:860px;width:100%;
+      border-radius:6px;
+      border:2px solid var(--gold);
+      box-shadow:0 0 80px rgba(201,146,42,.2),inset 0 0 40px rgba(20,12,0,.03);
+      margin-top:68px;
+      overflow:hidden;
+      animation:rise .8s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes rise{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:none;}}
+
+    /* gold rod top */
+    .panel::before{
+      content:'';display:block;
+      height:20px;
+      background:linear-gradient(to right,#a07020,var(--gold),#a07020);
+      box-shadow:0 3px 10px rgba(20,12,0,.35);
+    }
+    /* gold rod bottom */
+    .panel::after{
+      content:'';display:block;
+      height:20px;
+      background:linear-gradient(to right,#a07020,var(--gold),#a07020);
+      box-shadow:0 -3px 10px rgba(20,12,0,.35);
+    }
+
+    .panel-inner{padding:2.2rem 3rem 2.5rem;}
+
+    /*── page header ──*/
+    .pg-eyebrow{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.55rem;letter-spacing:.4em;
+      color:var(--red);text-transform:uppercase;
+      text-align:center;margin-bottom:.5rem;
+    }
+    .pg-title{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:clamp(1.4rem,3.5vw,2rem);
+      color:var(--ink);text-align:center;line-height:1.2;
+    }
+    .pg-title em{color:var(--gold);font-style:normal;}
+    .pg-div{width:100px;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:.9rem auto 1rem;}
+
+    /*══════════════════════════════════════════
+      GAME LAYOUT  — two columns
+    ══════════════════════════════════════════*/
+    .game-grid{
+      display:grid;
+      grid-template-columns:1fr 1.35fr;
+      gap:2rem;
+      align-items:start;
+      margin-bottom:1.5rem;
+    }
+    @media(max-width:620px){
+      .game-grid{grid-template-columns:1fr;}
+      .panel-inner{padding:1.8rem 1.5rem 2rem;}
+    }
+
+    /*══════════════════════════════════════════
+      LEFT COL — Panda Gallows (SVG)
+    ══════════════════════════════════════════*/
+    .gallows-wrap{
+      background:rgba(20,12,0,.04);
+      border:1px solid rgba(201,146,42,.25);
+      border-radius:5px;
+      padding:1.2rem;
+      display:flex;flex-direction:column;align-items:center;gap:.8rem;
+    }
+    .gallows-title{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.55rem;letter-spacing:.2em;
+      color:var(--gold);text-transform:uppercase;
+    }
+    #gallowsSvg{width:100%;max-width:200px;height:220px;}
+
+    /* lives pips */
+    .lives-row{display:flex;gap:.4rem;align-items:center;}
+    .life-pip{
+      width:12px;height:12px;border-radius:50%;
+      background:var(--jade);
+      transition:background .3s,transform .3s;
+    }
+    .life-pip.lost{background:var(--red);transform:scale(.75);}
+
+    /*══════════════════════════════════════════
+      RIGHT COL
+    ══════════════════════════════════════════*/
+
+    /* topic badge */
+    .topic-badge{
+      display:inline-block;
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.5rem;letter-spacing:.2em;
+      color:var(--jade);text-transform:uppercase;
+      background:rgba(45,106,79,.1);
+      border:1px solid rgba(45,106,79,.3);
+      border-radius:2px;padding:.25rem .7rem;
+      margin-bottom:.9rem;
+    }
+
+    /* clue */
+    .clue-label{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.55rem;letter-spacing:.15em;
+      color:rgba(20,12,0,.4);margin-bottom:.35rem;
+    }
+    .clue-text{
+      font-size:1rem;font-style:italic;
+      color:rgba(20,12,0,.72);line-height:1.65;
+      margin-bottom:1.1rem;
+      border-left:3px solid var(--gold);
+      padding-left:.85rem;
+    }
+
+    /* word display */
+    .word-row{
+      display:flex;flex-wrap:wrap;gap:.45rem;
+      margin-bottom:1.3rem;
+      min-height:48px;
+    }
+    .letter-box{
+      width:32px;height:38px;
+      display:flex;align-items:flex-end;justify-content:center;
+      padding-bottom:4px;
+      font-family:'Noto Serif SC',serif;
+      font-size:1.25rem;font-weight:700;
+      color:var(--ink);
+      border-bottom:2.5px solid var(--ink);
+      transition:color .3s,border-color .3s;
+      animation:popIn .25s ease both;
+    }
+    .letter-box.space{border-bottom:none;width:16px;}
+    .letter-box.revealed{color:var(--jade);}
+    .letter-box.wrong-reveal{color:var(--red);}
+    @keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+    /* wrong letters */
+    .wrong-section{margin-bottom:1.1rem;}
+    .wrong-label{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.52rem;letter-spacing:.15em;
+      color:rgba(20,12,0,.38);margin-bottom:.4rem;
+    }
+    .wrong-letters{
+      display:flex;flex-wrap:wrap;gap:.35rem;min-height:28px;
+    }
+    .wrong-chip{
+      font-family:'Noto Serif SC',serif;
+      font-size:.9rem;font-weight:700;
+      color:var(--red);
+      background:rgba(139,26,10,.1);
+      border:1px solid rgba(139,26,10,.35);
+      border-radius:3px;
+      padding:.15rem .55rem;
+      animation:popIn .2s ease both;
+    }
+
+    /*══════════════════════════════════════════
+      KEYBOARD
+    ══════════════════════════════════════════*/
+    .keyboard{
+      display:flex;flex-wrap:wrap;gap:.4rem;
+      justify-content:center;
+      margin-top:.5rem;
+    }
+    .key{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.62rem;
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(201,146,42,.1);
+      border:1.5px solid rgba(201,146,42,.35);
+      border-radius:4px;
+      cursor:pointer;
+      color:var(--ink);
+      transition:background .15s,border-color .15s,transform .1s,opacity .2s;
+      user-select:none;
+    }
+    .key:hover:not(.used){
+      background:rgba(201,146,42,.22);
+      border-color:var(--gold);
+      transform:translateY(-2px);
+    }
+    .key:active:not(.used){transform:scale(.93);}
+    .key.correct{
+      background:rgba(45,106,79,.15);
+      border-color:var(--jade);
+      color:var(--jade);
+      cursor:default;
+    }
+    .key.wrong-key{
+      background:rgba(139,26,10,.1);
+      border-color:rgba(139,26,10,.35);
+      color:var(--red);
+      opacity:.55;
+      cursor:default;
+    }
+
+    /*══════════════════════════════════════════
+      STATUS BAR
+    ══════════════════════════════════════════*/
+    .status-bar{
+      margin-top:1.4rem;
+      padding:.9rem 1.2rem;
+      border-radius:4px;
+      font-family:'Crimson Pro',Georgia,serif;
+      font-size:1rem;font-style:italic;line-height:1.6;
+      display:none;
+      animation:fadeUp .4s ease both;
+    }
+    .status-bar.show{display:block;}
+    .status-bar.win{
+      background:rgba(45,106,79,.1);
+      border-left:3px solid var(--jade);
+      color:var(--jade);
+    }
+    .status-bar.lose{
+      background:rgba(139,26,10,.08);
+      border-left:3px solid var(--red);
+      color:var(--red);
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+    /*══════════════════════════════════════════
+      BUTTONS
+    ══════════════════════════════════════════*/
+    .btn-row{display:flex;gap:.9rem;margin-top:1.2rem;flex-wrap:wrap;}
+    .btn{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.62rem;letter-spacing:.18em;
+      border:none;border-radius:3px;
+      padding:.8rem 1.5rem;cursor:pointer;
+      transition:background .2s,transform .15s,box-shadow .2s;
+      text-transform:uppercase;
+    }
+    .btn:active{transform:scale(.96);}
+    .btn-gold{
+      background:var(--gold);color:var(--ink);
+      box-shadow:0 3px 14px rgba(201,146,42,.35);
+    }
+    .btn-gold:hover{background:var(--glt);box-shadow:0 5px 22px rgba(201,146,42,.5);}
+    .btn-dark{
+      background:var(--ink);color:var(--p);
+      box-shadow:0 3px 10px rgba(20,12,0,.3);
+    }
+    .btn-dark:hover{background:#2c1800;}
+    .btn-jade{
+      background:var(--jade);color:var(--p);
+      box-shadow:0 3px 14px rgba(45,106,79,.4);
+      animation:glowJ 2s ease-in-out infinite;
+    }
+    .btn-jade:hover{background:var(--jlt);}
+    @keyframes glowJ{
+      0%,100%{box-shadow:0 3px 14px rgba(45,106,79,.4);}
+      50%{box-shadow:0 5px 24px rgba(45,106,79,.7);}
+    }
+
+    /*══════════════════════════════════════════
+      SCORE STRIP
+    ══════════════════════════════════════════*/
+    .score-strip{
+      display:flex;gap:1.5rem;flex-wrap:wrap;
+      background:rgba(20,12,0,.04);
+      border:1px solid rgba(201,146,42,.22);
+      border-radius:4px;
+      padding:.7rem 1.1rem;
+      margin-bottom:1.4rem;
+      align-items:center;
+    }
+    .stat{display:flex;flex-direction:column;align-items:center;gap:.1rem;}
+    .stat-val{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:1.2rem;color:var(--gold);line-height:1;
+    }
+    .stat-lbl{
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.48rem;letter-spacing:.15em;
+      color:rgba(20,12,0,.38);text-transform:uppercase;
+    }
+    .stat-div{width:1px;height:32px;background:rgba(201,146,42,.25);}
+
+    /*══════════════════════════════════════════
+      REVEAL ANSWER (on loss)
+    ══════════════════════════════════════════*/
+    .answer-reveal{
+      font-family:'Noto Serif SC',serif;
+      font-size:1.3rem;font-weight:700;
+      color:var(--red);
+      letter-spacing:.08em;
+      margin-top:.3rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-logo">☯ <span>Dragon</span>Warrior</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="introduction.html">Introduction</a></li>
+    <li><a href="citizen.html">Citizen</a></li>
+    <li><a href="hangman.html" class="active">Hangman</a></li>
+  </ul>
+</nav>
+
+<div class="stage">
+  <!-- rings & bamboo -->
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="bam"></div><div class="bam"></div><div class="bam"></div><div class="bam"></div>
+
+  <div class="panel">
+    <div class="panel-inner">
+
+      <!-- header -->
+      <p class="pg-eyebrow">☯ &nbsp; The Wisdom of Master Shifu &nbsp; ☯</p>
+      <h1 class="pg-title"><em>Biology</em> Hangman — IGCSE Edition</h1>
+      <div class="pg-div"></div>
+
+      <!-- score strip -->
+      <div class="score-strip">
+        <div class="stat">
+          <span class="stat-val" id="sWins">0</span>
+          <span class="stat-lbl">Victories</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat">
+          <span class="stat-val" id="sLoss">0</span>
+          <span class="stat-lbl">Defeats</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat">
+          <span class="stat-val" id="sStreak">0</span>
+          <span class="stat-lbl">Streak</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat">
+          <span class="stat-val" id="sPlayed">0</span>
+          <span class="stat-lbl">Played</span>
+        </div>
+      </div>
+
+      <!-- game grid -->
+      <div class="game-grid">
+
+        <!-- LEFT: gallows + lives -->
+        <div class="gallows-wrap">
+          <p class="gallows-title">☯ The Scaffold</p>
+
+          <!-- SVG Panda Gallows -->
+          <svg id="gallowsSvg" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+            <!-- structure (always visible) -->
+            <!-- base -->
+            <rect x="20" y="205" width="160" height="8" rx="3" fill="#c9922a"/>
+            <!-- pole -->
+            <rect x="60" y="20"  width="8"   height="186" rx="3" fill="#8b5e1a"/>
+            <!-- beam -->
+            <rect x="60" y="20"  width="80"  height="8"   rx="3" fill="#8b5e1a"/>
+            <!-- rope -->
+            <line x1="140" y1="28" x2="140" y2="48" stroke="#8b5e1a" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- PANDA parts — revealed one by one (id=p0..p6) -->
+            <!-- p0: head -->
+            <g id="p0" display="none">
+              <circle cx="140" cy="65" r="17" fill="none" stroke="#1a0f00" stroke-width="2.5"/>
+              <!-- panda ears -->
+              <circle cx="127" cy="52" r="6"  fill="#1a0f00"/>
+              <circle cx="153" cy="52" r="6"  fill="#1a0f00"/>
+              <!-- eyes -->
+              <ellipse cx="134" cy="63" rx="5" ry="5" fill="#1a0f00"/>
+              <ellipse cx="146" cy="63" rx="5" ry="5" fill="#1a0f00"/>
+              <circle cx="135.5" cy="61.5" r="1.5" fill="white"/>
+              <circle cx="147.5" cy="61.5" r="1.5" fill="white"/>
+              <!-- nose -->
+              <ellipse cx="140" cy="69" rx="3" ry="2" fill="#1a0f00"/>
+              <!-- mouth (neutral) -->
+              <path d="M136 73 Q140 76 144 73" fill="none" stroke="#1a0f00" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+
+            <!-- p1: body -->
+            <g id="p1" display="none">
+              <ellipse cx="140" cy="110" rx="19" ry="24" fill="none" stroke="#1a0f00" stroke-width="2.5"/>
+              <!-- belly circle -->
+              <ellipse cx="140" cy="112" rx="12" ry="14" fill="rgba(20,12,0,.07)" stroke="none"/>
+            </g>
+
+            <!-- p2: left arm -->
+            <line id="p2" x1="121" y1="98"  x2="106" y2="118" display="none"
+                  stroke="#1a0f00" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- p3: right arm -->
+            <line id="p3" x1="159" y1="98"  x2="174" y2="118" display="none"
+                  stroke="#1a0f00" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- p4: left leg -->
+            <line id="p4" x1="131" y1="133" x2="120" y2="158" display="none"
+                  stroke="#1a0f00" stroke-width="3" stroke-linecap="round"/>
+            <!-- left foot -->
+            <ellipse id="p4f" cx="117" cy="161" rx="7" ry="4" display="none"
+                     fill="none" stroke="#1a0f00" stroke-width="2"/>
+
+            <!-- p5: right leg -->
+            <line id="p5" x1="149" y1="133" x2="160" y2="158" display="none"
+                  stroke="#1a0f00" stroke-width="3" stroke-linecap="round"/>
+            <!-- right foot -->
+            <ellipse id="p5f" cx="163" cy="161" rx="7" ry="4" display="none"
+                     fill="none" stroke="#1a0f00" stroke-width="2"/>
+
+            <!-- p6: X eyes (game over) -->
+            <g id="p6" display="none">
+              <line x1="130" y1="59" x2="138" y2="67" stroke="#8b1a0a" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="138" y1="59" x2="130" y2="67" stroke="#8b1a0a" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="142" y1="59" x2="150" y2="67" stroke="#8b1a0a" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="150" y1="59" x2="142" y2="67" stroke="#8b1a0a" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- sad mouth -->
+              <path d="M136 75 Q140 72 144 75" fill="none" stroke="#8b1a0a" stroke-width="2" stroke-linecap="round"/>
+            </g>
+          </svg>
+
+          <!-- lives pips -->
+          <div class="lives-row" id="livesPips"></div>
+          <p style="font-family:'Cinzel Decorative',cursive;font-size:.52rem;letter-spacing:.12em;color:rgba(20,12,0,.38);margin-top:.3rem;" id="livesLabel">6 lives remaining</p>
+        </div>
+
+        <!-- RIGHT: word + clue + keyboard -->
+        <div>
+          <span class="topic-badge" id="topicBadge">—</span>
+
+          <p class="clue-label">☰ Master Shifu's Clue</p>
+          <p class="clue-text" id="clueText">—</p>
+
+          <div class="word-row" id="wordRow"></div>
+
+          <div class="wrong-section">
+            <p class="wrong-label">☰ Wrong guesses</p>
+            <div class="wrong-letters" id="wrongLetters"></div>
+          </div>
+
+          <div class="keyboard" id="keyboard"></div>
+
+          <!-- status -->
+          <div class="status-bar" id="statusBar"></div>
+          <div id="answerRevealWrap"></div>
+
+          <div class="btn-row">
+            <button class="btn btn-gold" id="btnNew" onclick="newGame()">☯ New Scroll</button>
+            <button class="btn btn-dark" id="btnHint" onclick="useHint()">Use Hint (–1 life)</button>
+            <a href="index.html" class="btn btn-jade" id="btnHome" style="display:none;text-decoration:none;">Enter Palace →</a>
+          </div>
+        </div>
+
+      </div><!-- end game-grid -->
+
+    </div><!-- end panel-inner -->
+  </div><!-- end panel -->
+</div>
+
+<script>
+/*══════════════════════════════════════════════════════
+  WORD BANK  — 40 IGCSE Biology terms + clues
+══════════════════════════════════════════════════════*/
+const WORDS = [
+  {w:"MITOCHONDRIA",  t:"Cell Biology",    c:"The powerhouse of the cell — produces ATP through aerobic respiration."},
+  {w:"CHLOROPLAST",   t:"Photosynthesis",  c:"The organelle where light energy is captured to make glucose in plant cells."},
+  {w:"OSMOSIS",       t:"Transport",       c:"The movement of water molecules across a partially permeable membrane down a water potential gradient."},
+  {w:"DIFFUSION",     t:"Transport",       c:"The net movement of particles from a region of high concentration to low concentration."},
+  {w:"PHOTOSYNTHESIS",t:"Photosynthesis",  c:"The process by which plants use light, water and CO₂ to produce glucose and oxygen."},
+  {w:"TRANSPIRATION", t:"Plants",          c:"The loss of water vapour from leaves through stomata."},
+  {w:"RESPIRATION",   t:"Respiration",     c:"The process of releasing energy from glucose — can be aerobic or anaerobic."},
+  {w:"MEIOSIS",       t:"Cell Division",   c:"Cell division that produces four genetically different haploid cells — used in sexual reproduction."},
+  {w:"MITOSIS",       t:"Cell Division",   c:"Cell division that produces two genetically identical diploid cells — used for growth and repair."},
+  {w:"ENZYME",        t:"Biochemistry",    c:"A biological catalyst made of protein that speeds up chemical reactions in living organisms."},
+  {w:"CHROMOSOME",    t:"Genetics",        c:"A thread-like structure in the nucleus made of DNA, carrying genetic information."},
+  {w:"ALLELE",        t:"Genetics",        c:"An alternative version of a gene found at the same locus on a chromosome."},
+  {w:"PHENOTYPE",     t:"Genetics",        c:"The observable characteristics of an organism, produced by genotype and environment."},
+  {w:"GENOTYPE",      t:"Genetics",        c:"The genetic make-up of an organism — its combination of alleles."},
+  {w:"DOMINANT",      t:"Genetics",        c:"An allele that is always expressed in the phenotype, even in a heterozygote."},
+  {w:"RECESSIVE",     t:"Genetics",        c:"An allele only expressed in the phenotype when two copies are present (homozygous)."},
+  {w:"HOMEOSTASIS",   t:"Homeostasis",     c:"The maintenance of a constant internal environment in the body."},
+  {w:"DENATURATION",  t:"Enzymes",         c:"The permanent change in an enzyme's 3D shape when exposed to high temperature or extreme pH."},
+  {w:"ECOSYSTEM",     t:"Ecology",         c:"All the organisms living in an area plus the non-living environment they interact with."},
+  {w:"BIODIVERSITY",  t:"Ecology",         c:"The variety of all living organisms in an area — including species, genetic, and ecosystem diversity."},
+  {w:"DECOMPOSER",    t:"Ecology",         c:"An organism (e.g. fungi, bacteria) that breaks down dead organic matter, recycling nutrients."},
+  {w:"ANTIBODY",      t:"Immunity",        c:"A protein produced by lymphocytes that binds specifically to a particular antigen."},
+  {w:"PATHOGEN",      t:"Immunity",        c:"A microorganism (virus, bacterium, fungus or protist) that causes disease."},
+  {w:"VACCINATION",   t:"Immunity",        c:"The introduction of a weakened or dead pathogen to stimulate immune memory without causing disease."},
+  {w:"HORMONE",       t:"Coordination",    c:"A chemical messenger secreted by an endocrine gland and transported in the blood."},
+  {w:"NEURONE",       t:"Coordination",    c:"A specialised nerve cell that carries electrical impulses through the nervous system."},
+  {w:"SYNAPSE",       t:"Coordination",    c:"The junction between two neurones where a chemical neurotransmitter passes across a gap."},
+  {w:"PLASMID",       t:"Biotechnology",   c:"A small circular loop of DNA found in bacteria, used as a vector in genetic engineering."},
+  {w:"FERMENTATION",  t:"Respiration",     c:"Anaerobic respiration in yeast that produces ethanol and carbon dioxide."},
+  {w:"XYLEM",         t:"Plants",          c:"Dead, hollow plant vessels that carry water and mineral salts from roots to leaves."},
+  {w:"PHLOEM",        t:"Plants",          c:"Living plant tissue that transports sugars (mainly sucrose) made in leaves to all plant parts."},
+  {w:"HAEMOGLOBIN",   t:"Human Biology",   c:"The red pigment in red blood cells that reversibly binds oxygen for transport."},
+  {w:"PERISTALSIS",   t:"Digestion",       c:"The wave-like muscular contractions that push food along the gut."},
+  {w:"VILLI",         t:"Digestion",       c:"Finger-like projections in the small intestine that increase the surface area for absorption."},
+  {w:"GLYCOGEN",      t:"Metabolism",      c:"The storage form of glucose in animals, stored mainly in the liver and muscle cells."},
+  {w:"INSULIN",       t:"Homeostasis",     c:"The hormone secreted by the pancreas that lowers blood glucose by stimulating uptake into cells."},
+  {w:"GLUCAGON",      t:"Homeostasis",     c:"The hormone that raises blood glucose by stimulating conversion of glycogen to glucose in the liver."},
+  {w:"LENTICEL",      t:"Plants",          c:"A small pore in the bark of woody stems that allows gas exchange."},
+  {w:"TROPISM",       t:"Plants",          c:"A directional growth response in plants to a stimulus such as light or gravity."},
+  {w:"DIALYSIS",      t:"Homeostasis",     c:"The artificial process that removes urea and excess salts from the blood of patients with kidney failure."},
+];
+
+/*══════════════════════════════════════════════════════
+  STATE
+══════════════════════════════════════════════════════*/
+const MAX_WRONG = 6;
+const PARTS     = ['p0','p1','p2','p3','p4','p5']; // p6 = X eyes on final loss
+
+let word='', clue='', topic='';
+let guessed=new Set(), wrong=[], lives=MAX_WRONG;
+let over=false, hintUsed=false;
+let stats={ wins:0, loss:0, streak:0, played:0 };
+let usedIndices=new Set();
+
+/*══════════════════════════════════════════════════════
+  INIT
+══════════════════════════════════════════════════════*/
+function newGame(){
+  // cycle through all words before repeating
+  if(usedIndices.size >= WORDS.length) usedIndices.clear();
+  let idx;
+  do{ idx=Math.floor(Math.random()*WORDS.length); } while(usedIndices.has(idx));
+  usedIndices.add(idx);
+
+  const entry=WORDS[idx];
+  word=entry.w; clue=entry.c; topic=entry.t;
+  guessed=new Set(); wrong=[]; lives=MAX_WRONG; over=false; hintUsed=false;
+
+  document.getElementById('topicBadge').textContent = topic.toUpperCase();
+  document.getElementById('clueText').textContent   = clue;
+  document.getElementById('statusBar').classList.remove('show','win','lose');
+  document.getElementById('statusBar').textContent='';
+  document.getElementById('answerRevealWrap').innerHTML='';
+  document.getElementById('btnHome').style.display='none';
+
+  renderGallows();
+  renderLives();
+  renderWord();
+  renderWrong();
+  renderKeyboard();
+}
+
+/*══════════════════════════════════════════════════════
+  RENDER HELPERS
+══════════════════════════════════════════════════════*/
+function renderGallows(){
+  PARTS.forEach((id,i)=>{
+    document.getElementById(id).setAttribute('display', i < (MAX_WRONG-lives) ? '' : 'none');
+  });
+  // p4f, p5f feet
+  document.getElementById('p4f').setAttribute('display', (MAX_WRONG-lives)>=5 ? '' : 'none');
+  document.getElementById('p5f').setAttribute('display', (MAX_WRONG-lives)>=6 ? '' : 'none');
+  // X eyes
+  document.getElementById('p6').setAttribute('display', lives===0 ? '' : 'none');
+}
+
+function renderLives(){
+  const row=document.getElementById('livesPips');
+  row.innerHTML='';
+  for(let i=0;i<MAX_WRONG;i++){
+    const pip=document.createElement('div');
+    pip.className='life-pip'+(i>= lives?' lost':'');
+    row.appendChild(pip);
+  }
+  document.getElementById('livesLabel').textContent=`${lives} life${lives!==1?'s':''} remaining`;
+}
+
+function renderWord(){
+  const row=document.getElementById('wordRow');
+  row.innerHTML='';
+  word.split('').forEach(ch=>{
+    const box=document.createElement('div');
+    if(ch===' '){
+      box.className='letter-box space';
+    } else {
+      const revealed=guessed.has(ch);
+      box.className='letter-box'+(revealed?' revealed':'');
+      box.textContent=revealed ? ch : '';
+    }
+    row.appendChild(box);
+  });
+}
+
+function renderWrong(){
+  const el=document.getElementById('wrongLetters');
+  el.innerHTML='';
+  wrong.forEach(ch=>{
+    const chip=document.createElement('span');
+    chip.className='wrong-chip';
+    chip.textContent=ch;
+    el.appendChild(chip);
+  });
+}
+
+function renderKeyboard(){
+  const kb=document.getElementById('keyboard');
+  kb.innerHTML='';
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(ch=>{
+    const btn=document.createElement('button');
+    btn.className='key';
+    btn.textContent=ch;
+    if(guessed.has(ch)){
+      btn.classList.add(word.includes(ch)?'correct':'wrong-key');
+    }
+    btn.onclick=()=>guess(ch);
+    kb.appendChild(btn);
+  });
+}
+
+function updateStats(){
+  document.getElementById('sWins').textContent   = stats.wins;
+  document.getElementById('sLoss').textContent   = stats.loss;
+  document.getElementById('sStreak').textContent = stats.streak;
+  document.getElementById('sPlayed').textContent = stats.played;
+}
+
+/*══════════════════════════════════════════════════════
+  GUESS LOGIC
+══════════════════════════════════════════════════════*/
+function guess(ch){
+  if(over||guessed.has(ch)) return;
+  guessed.add(ch);
+
+  if(word.includes(ch)){
+    renderWord();
+    renderKeyboard();
+    // check win
+    const allRevealed=[...word].filter(c=>c!==' ').every(c=>guessed.has(c));
+    if(allRevealed) endGame(true);
+  } else {
+    wrong.push(ch);
+    lives--;
+    renderGallows();
+    renderLives();
+    renderWrong();
+    renderKeyboard();
+    if(lives===0) endGame(false);
+  }
+}
+
+/*══════════════════════════════════════════════════════
+  HINT
+══════════════════════════════════════════════════════*/
+function useHint(){
+  if(over||lives<=1) return;
+  // reveal a random unrevealed letter
+  const hidden=[...word].filter(c=>c!==' '&&!guessed.has(c));
+  if(hidden.length===0) return;
+  lives--;
+  const pick=hidden[Math.floor(Math.random()*hidden.length)];
+  guessed.add(pick);
+  renderGallows();
+  renderLives();
+  renderWord();
+  renderKeyboard();
+  const allRevealed=[...word].filter(c=>c!==' ').every(c=>guessed.has(c));
+  if(allRevealed) endGame(true);
+}
+
+/*══════════════════════════════════════════════════════
+  END GAME
+══════════════════════════════════════════════════════*/
+function endGame(won){
+  over=true;
+  stats.played++;
+  const sb=document.getElementById('statusBar');
+  const arw=document.getElementById('answerRevealWrap');
+
+  if(won){
+    stats.wins++;stats.streak++;
+    sb.className='status-bar show win';
+    sb.innerHTML=stats.streak>=3
+      ? `🎋 <strong>SKADOOSH!</strong> "${word}" — ${stats.streak} in a row, Dragon Warrior!`
+      : `🎋 <strong>Correct! </strong> The answer was indeed <strong>${word}</strong>. Master Shifu is impressed.`;
+    document.getElementById('btnHome').style.display='inline-flex';
+  } else {
+    stats.loss++;stats.streak=0;
+    // reveal full word with red colour
+    renderWord(); // still shows guessed
+    // override to show all in red
+    const boxes=document.getElementById('wordRow').querySelectorAll('.letter-box:not(.space)');
+    boxes.forEach((b,i)=>{
+      const ch=[...word].filter(c=>c!==' ')[i]||'';
+      b.textContent=ch;
+      if(!guessed.has(ch)) b.classList.add('wrong-reveal');
+    });
+    sb.className='status-bar show lose';
+    sb.innerHTML=`🥋 <strong>Defeated!</strong> Master Shifu shakes his head. The answer was:`;
+    const rev=document.createElement('div');
+    rev.className='answer-reveal';
+    rev.textContent=word;
+    arw.appendChild(rev);
+  }
+
+  updateStats();
+}
+
+/*══════════════════════════════════════════════════════
+  KEYBOARD INPUT
+══════════════════════════════════════════════════════*/
+document.addEventListener('keydown',e=>{
+  const ch=e.key.toUpperCase();
+  if(/^[A-Z]$/.test(ch)) guess(ch);
+});
+
+/* start */
+newGame();
+updateStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Sacred Trial — IGCSE Biology Gate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       ROOT & RESET
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #140c00;
+      --parch:      #f7edd5;
+      --parch-dim:  #ecdbb8;
+      --gold:       #c9922a;
+      --gold-lt:    #f0c060;
+      --red:        #8b1a0a;
+      --jade:       #2d6a4f;
+      --jade-lt:    #52b788;
+      --smoke:      rgba(20,12,0,.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: var(--ink);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='9' cy='9' r='3.5' fill='%23c9922a' opacity='.85'/%3E%3C/svg%3E") 9 9, pointer;
+    }
+
+    /* ═══════════════════════════════════════════
+       PAGE LAYOUT
+    ═══════════════════════════════════════════ */
+    .stage {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 3rem 1rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── ambient glow rings ── */
+    .ring {
+      position: fixed;
+      border-radius: 50%;
+      border: 1px solid rgba(201,146,42,.1);
+      pointer-events: none;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: breathe 10s ease-in-out infinite;
+    }
+    .ring:nth-child(1){ width:500px;  height:500px; }
+    .ring:nth-child(2){ width:800px;  height:800px; animation-delay:-3.3s; }
+    .ring:nth-child(3){ width:1100px; height:1100px;animation-delay:-6.6s; }
+    @keyframes breathe {
+      0%,100%{ opacity:.7; transform:translate(-50%,-50%) scale(1); }
+      50%    { opacity:.3; transform:translate(-50%,-50%) scale(1.04); }
+    }
+
+    /* ── bamboo ── */
+    .bam {
+      position: fixed; bottom: 0;
+      width: 14px;
+      background: linear-gradient(to top,#1b360e,#3a6b1c,#1b360e);
+      border-radius: 2px 2px 0 0;
+      opacity: .22;
+      pointer-events: none;
+    }
+    .bam::before,.bam::after {
+      content:''; position:absolute;
+      left:-9px; width:32px; height:6px;
+      background:inherit; border-radius:3px; opacity:.65;
+    }
+    .bam::before{ top:32%; } .bam::after{ top:63%; }
+    .bam:nth-child(4) { left:3%;  height:58vh; animation:sw 7s ease-in-out infinite; }
+    .bam:nth-child(5) { left:6%;  height:72vh; animation:sw 9s ease-in-out infinite reverse; width:11px; }
+    .bam:nth-child(6) { right:4%; height:63vh; animation:sw 8s ease-in-out infinite; }
+    .bam:nth-child(7) { right:7%; height:50vh; animation:sw 11s ease-in-out infinite reverse; width:11px; }
+    @keyframes sw { 0%,100%{ transform:rotate(-1.2deg); } 50%{ transform:rotate(1.6deg); } }
+
+    /* ═══════════════════════════════════════════
+       SCROLL PANEL
+    ═══════════════════════════════════════════ */
+    .scroll {
+      position: relative;
+      z-index: 10;
+      background: var(--parch);
+      max-width: 780px; width: 100%;
+      border-radius: 6px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 80px rgba(201,146,42,.22), inset 0 0 50px rgba(20,12,0,.03);
+      padding: 3.5rem 3.5rem 3rem;
+      animation: unfurl .9s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes unfurl {
+      from { opacity:0; transform:scaleY(.7) translateY(-30px); }
+      to   { opacity:1; transform:scaleY(1)  translateY(0); }
+    }
+
+    /* scroll rod top/bottom */
+    .scroll::before,.scroll::after {
+      content:'';
+      position:absolute; left:-12px; right:-12px; height:22px;
+      background: linear-gradient(to right, #a07020, var(--gold), #a07020);
+      border-radius: 20px;
+      box-shadow: 0 3px 10px rgba(20,12,0,.4);
+    }
+    .scroll::before{ top:-11px; }
+    .scroll::after { bottom:-11px; }
+
+    /* ── header ── */
+    .eyebrow {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: .58rem; letter-spacing:.42em;
+      color: var(--red); text-transform:uppercase;
+      text-align:center; margin-bottom:.6rem;
+    }
+    .main-title {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(1.4rem,3.5vw,2.1rem);
+      color: var(--ink); text-align:center; line-height:1.2;
+      margin-bottom:.5rem;
+    }
+    .main-title em { color:var(--gold); font-style:normal; }
+    .divider {
+      width:110px; height:2px;
+      background:linear-gradient(to right,transparent,var(--gold),transparent);
+      margin:1rem auto 1.1rem;
+    }
+    .subtitle {
+      font-size:1.05rem; font-style:italic;
+      color:rgba(20,12,0,.65); text-align:center;
+      line-height:1.7; margin-bottom:2.2rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       PROGRESS BAR
+    ═══════════════════════════════════════════ */
+    .progress-wrap {
+      margin-bottom:1.8rem;
+    }
+    .progress-top {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:.45rem;
+    }
+    .progress-label {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.58rem; letter-spacing:.15em;
+      color:rgba(20,12,0,.45);
+    }
+    .progress-bar {
+      height:6px; background:rgba(20,12,0,.1);
+      border-radius:3px; overflow:hidden;
+    }
+    .progress-fill {
+      height:100%;
+      background:linear-gradient(to right,var(--gold),var(--red));
+      border-radius:3px;
+      transition:width .5s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ═══════════════════════════════════════════
+       QUESTION CARD
+    ═══════════════════════════════════════════ */
+    .q-card {
+      background: rgba(20,12,0,.03);
+      border:1px solid rgba(201,146,42,.28);
+      border-radius:5px;
+      padding:2rem 2rem 1.6rem;
+      margin-bottom:1.4rem;
+      position:relative;
+      overflow:hidden;
+    }
+    .q-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(to right,var(--gold),var(--red));
+    }
+
+    /* topic badge */
+    .q-topic {
+      display:inline-block;
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.5rem; letter-spacing:.2em;
+      color:var(--jade); text-transform:uppercase;
+      background:rgba(45,106,79,.1);
+      border:1px solid rgba(45,106,79,.3);
+      border-radius:2px; padding:.25rem .7rem;
+      margin-bottom:.9rem;
+    }
+
+    /* question number + text */
+    .q-number {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.62rem; letter-spacing:.15em;
+      color:var(--gold); margin-bottom:.5rem;
+    }
+    .q-text {
+      font-size:1.15rem; line-height:1.75;
+      color:var(--ink); margin-bottom:1.4rem;
+      font-weight:400;
+    }
+
+    /* answer options */
+    .options { display:flex; flex-direction:column; gap:.6rem; }
+
+    .option {
+      display:flex; align-items:center; gap:.9rem;
+      background:rgba(245,234,208,.55);
+      border:1.5px solid rgba(201,146,42,.22);
+      border-radius:4px;
+      padding:.75rem 1rem;
+      cursor:pointer;
+      transition:background .2s, border-color .2s, transform .15s;
+      user-select:none;
+    }
+    .option:hover:not(.locked) {
+      background:rgba(201,146,42,.1);
+      border-color:rgba(201,146,42,.55);
+      transform:translateX(4px);
+    }
+    .option.selected:not(.locked) {
+      background:rgba(201,146,42,.12);
+      border-color:var(--gold);
+    }
+    .option.correct {
+      background:rgba(45,106,79,.12);
+      border-color:var(--jade);
+    }
+    .option.wrong {
+      background:rgba(139,26,10,.1);
+      border-color:var(--red);
+    }
+
+    .opt-letter {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.68rem; letter-spacing:.05em;
+      width:26px; height:26px;
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(201,146,42,.15);
+      color:var(--gold);
+      flex-shrink:0;
+      transition:background .2s, color .2s;
+    }
+    .option.correct .opt-letter { background:var(--jade);       color:#fff; }
+    .option.wrong   .opt-letter { background:var(--red);        color:#fff; }
+    .option.selected:not(.locked):not(.correct):not(.wrong) .opt-letter {
+      background:var(--gold); color:var(--ink);
+    }
+
+    .opt-text {
+      font-size:1rem; line-height:1.55;
+      color:rgba(20,12,0,.82);
+    }
+    .option.correct .opt-text { color:var(--jade);  font-weight:600; }
+    .option.wrong   .opt-text { color:var(--red);   font-weight:600; }
+
+    /* explanation */
+    .explanation {
+      margin-top:1.1rem;
+      padding:.9rem 1.1rem;
+      background:rgba(45,106,79,.07);
+      border-left:3px solid var(--jade);
+      border-radius:2px;
+      font-size:.97rem; line-height:1.7;
+      color:rgba(20,12,0,.72);
+      display:none;
+      animation:fadeIn .35s ease both;
+    }
+    .explanation.show { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+    .explanation strong { color:var(--jade); }
+
+    /* ═══════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════ */
+    .btn-row {
+      display:flex; gap:1rem; margin-top:1rem;
+      flex-wrap:wrap;
+    }
+
+    .btn {
+      flex:1; min-width:120px;
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.65rem; letter-spacing:.18em;
+      border:none; border-radius:3px;
+      padding:.9rem 1.2rem;
+      cursor:pointer;
+      transition:background .25s, transform .15s, box-shadow .25s;
+      text-transform:uppercase;
+    }
+    .btn:active { transform:scale(.97); }
+    .btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+    .btn-check {
+      background:var(--gold);
+      color:var(--ink);
+      box-shadow:0 3px 14px rgba(201,146,42,.35);
+    }
+    .btn-check:hover:not(:disabled) {
+      background:var(--gold-lt);
+      box-shadow:0 5px 20px rgba(201,146,42,.5);
+    }
+
+    .btn-next {
+      background:var(--ink);
+      color:var(--parch);
+      box-shadow:0 3px 14px rgba(20,12,0,.3);
+      display:none;
+    }
+    .btn-next.show { display:flex; align-items:center; justify-content:center; gap:.5rem; }
+    .btn-next:hover { background:#2c1f0a; }
+
+    /* ═══════════════════════════════════════════
+       SCORE / RESULT SCREEN
+    ═══════════════════════════════════════════ */
+    #resultScreen { display:none; text-align:center; }
+    #resultScreen.show { display:block; animation:fadeIn .5s ease both; }
+
+    .score-ring {
+      width:110px; height:110px;
+      border-radius:50%;
+      border:4px solid var(--gold);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      margin:0 auto 1.5rem;
+      background:rgba(201,146,42,.07);
+      box-shadow:0 0 0 8px rgba(201,146,42,.1);
+    }
+    .score-num {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:2rem; color:var(--gold); line-height:1;
+    }
+    .score-denom {
+      font-size:.8rem; color:rgba(20,12,0,.5);
+    }
+
+    .result-title {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:clamp(1.2rem,3vw,1.8rem);
+      color:var(--ink); margin-bottom:.6rem; line-height:1.25;
+    }
+    .result-title .gold { color:var(--gold); }
+    .result-msg {
+      font-size:1.1rem; font-style:italic;
+      color:rgba(20,12,0,.65); line-height:1.7;
+      margin-bottom:1.8rem; max-width:52ch; margin-left:auto; margin-right:auto;
+    }
+
+    .btn-unlock {
+      display:inline-block;
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.7rem; letter-spacing:.2em;
+      color:var(--parch);
+      background:var(--jade);
+      border:none; border-radius:3px;
+      padding:1rem 2.5rem;
+      cursor:pointer; text-decoration:none;
+      transition:background .25s, transform .2s;
+      box-shadow:0 4px 18px rgba(45,106,79,.45);
+      animation:glowJade 2s ease-in-out infinite;
+    }
+    .btn-unlock:hover { background:var(--jade-lt); transform:translateY(-2px); }
+    @keyframes glowJade {
+      0%,100%{ box-shadow:0 4px 18px rgba(45,106,79,.45); }
+      50%    { box-shadow:0 6px 28px rgba(45,106,79,.75); }
+    }
+
+    .btn-retry {
+      display:inline-block;
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.65rem; letter-spacing:.15em;
+      color:var(--ink); background:var(--parch-dim);
+      border:1.5px solid var(--gold);
+      border-radius:3px; padding:.85rem 2rem;
+      cursor:pointer; margin-top:.8rem;
+      transition:background .2s;
+    }
+    .btn-retry:hover { background:rgba(201,146,42,.15); }
+
+    /* pass threshold label */
+    .pass-info {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.55rem; letter-spacing:.2em;
+      color:rgba(20,12,0,.38); margin-bottom:1.5rem;
+    }
+
+    /* ─ yin-yang decorative ─ */
+    .yy {
+      width:46px; height:46px; border-radius:50%;
+      background:linear-gradient(to bottom,var(--ink) 50%,var(--parch) 50%);
+      box-shadow:0 0 0 3px var(--gold);
+      position:relative; margin:0 auto 1.4rem;
+      animation:spin 22s linear infinite;
+    }
+    .yy::before,.yy::after {
+      content:''; position:absolute;
+      width:50%; height:50%; border-radius:50%; left:25%;
+    }
+    .yy::before{ top:0;    background:var(--parch); }
+    .yy::after { bottom:0; background:var(--ink);   }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* ─ attempts badge ─ */
+    .attempts-badge {
+      font-family:'Cinzel Decorative',cursive;
+      font-size:.52rem; letter-spacing:.12em;
+      color:rgba(20,12,0,.35);
+      text-align:right; margin-top:.5rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media(max-width:600px){
+      .scroll{ padding:2.5rem 1.5rem 2rem; }
+      .btn-row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+  <!-- ambient rings -->
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <!-- bamboo -->
+  <div class="bam"></div>
+  <div class="bam"></div>
+  <div class="bam"></div>
+  <div class="bam"></div>
+
+  <div class="scroll">
+
+    <!-- ══ HEADER ══ -->
+    <p class="eyebrow">☯ &nbsp; The Sacred Trial of Knowledge &nbsp; ☯</p>
+    <h1 class="main-title">Prove Your <em>Wisdom</em>,<br/>Enter the Palace</h1>
+    <div class="divider"></div>
+    <p class="subtitle">
+      Master Oogway speaks: <em>"A warrior who understands life itself is undefeatable."</em><br/>
+      Answer 5 IGCSE Biology challenges to unlock the Jade Palace.
+    </p>
+
+    <!-- ══ QUIZ BODY ══ -->
+    <div id="quizBody">
+
+      <!-- progress -->
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span class="progress-label" id="progressLabel">Question 1 of 5</span>
+          <span class="progress-label" id="scoreLabel">Score: 0</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- question card -->
+      <div class="q-card" id="qCard">
+        <span class="q-topic" id="qTopic"></span>
+        <p class="q-number"  id="qNumber"></p>
+        <p class="q-text"    id="qText"></p>
+        <div class="options" id="optionsList"></div>
+        <div class="explanation" id="explanation"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()">☯ Confirm Answer</button>
+        <button class="btn btn-next"  id="btnNext"  onclick="nextQuestion()">Next Scroll →</button>
+      </div>
+      <p class="attempts-badge" id="attemptsBadge">Question attempts: 0</p>
+
+    </div><!-- end quizBody -->
+
+    <!-- ══ RESULT SCREEN ══ -->
+    <div id="resultScreen">
+      <div class="yy"></div>
+      <div class="score-ring">
+        <span class="score-num" id="finalScore">0</span>
+        <span class="score-denom" id="finalDenom">/ 5</span>
+      </div>
+      <h2 class="result-title" id="resultTitle"></h2>
+      <p  class="result-msg"   id="resultMsg"></p>
+      <p  class="pass-info">Pass mark: 4 / 5 correct</p>
+      <div id="resultActions"></div>
+    </div>
+
+  </div><!-- end .scroll -->
+</div><!-- end .stage -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   QUESTION BANK  — 10 questions, 5 shown at random each run
+═══════════════════════════════════════════════════════════ */
+const BANK = [
+  {
+    topic: "Cell Biology",
+    q: "Which organelle is responsible for producing ATP through aerobic respiration?",
+    opts: ["Ribosome","Mitochondrion","Chloroplast","Nucleus"],
+    ans: 1,
+    explain: "<strong>Mitochondria</strong> are the sites of aerobic respiration. They produce ATP via the Krebs cycle and the electron transport chain — the cell's main energy currency."
+  },
+  {
+    topic: "Enzymes",
+    q: "An enzyme's active site changes shape so it can no longer bind its substrate. What has occurred?",
+    opts: ["Optimum temperature reached","Enzyme denaturation","Competitive inhibition","Hydrolysis"],
+    ans: 1,
+    explain: "<strong>Denaturation</strong> permanently alters the 3-D shape of the active site, so the enzyme-substrate complex can no longer form. High temperature or extreme pH are common causes."
+  },
+  {
+    topic: "Photosynthesis",
+    q: "Which gas is released as a by-product of the light-dependent reactions of photosynthesis?",
+    opts: ["Carbon dioxide","Nitrogen","Oxygen","Water vapour"],
+    ans: 2,
+    explain: "<strong>Oxygen</strong> is released when water molecules are split during photolysis in the light-dependent stage. This process also produces ATP and reduced NADP."
+  },
+  {
+    topic: "Transport in Plants",
+    q: "Water moves up a plant stem mainly through which tissue?",
+    opts: ["Phloem","Cortex","Xylem","Epidermis"],
+    ans: 2,
+    explain: "<strong>Xylem</strong> vessels are dead, hollow tubes that carry water and dissolved minerals from roots to leaves by transpiration pull (cohesion-tension mechanism)."
+  },
+  {
+    topic: "Genetics",
+    q: "A gene locus has two alleles: T (dominant) and t (recessive). Which genotype would show the recessive phenotype?",
+    opts: ["TT","Tt","tT","tt"],
+    ans: 3,
+    explain: "Only the <strong>homozygous recessive genotype (tt)</strong> expresses the recessive phenotype, because there is no dominant allele to mask it."
+  },
+  {
+    topic: "Human Biology",
+    q: "Which blood vessel carries oxygenated blood from the lungs to the heart?",
+    opts: ["Pulmonary artery","Aorta","Pulmonary vein","Vena cava"],
+    ans: 2,
+    explain: "The <strong>pulmonary vein</strong> is the only vein in the body carrying oxygenated blood — it transports blood from the lungs back to the left atrium of the heart."
+  },
+  {
+    topic: "Ecology",
+    q: "Which term describes all the populations of different species living and interacting in the same area?",
+    opts: ["Ecosystem","Community","Population","Habitat"],
+    ans: 1,
+    explain: "A <strong>community</strong> consists of all populations of different species within a defined area. Add the non-living (abiotic) environment and you have an ecosystem."
+  },
+  {
+    topic: "Respiration",
+    q: "During anaerobic respiration in animal cells, glucose is broken down to produce lactic acid and which other substance?",
+    opts: ["Carbon dioxide","Ethanol","ATP only","Oxygen"],
+    ans: 2,
+    explain: "In animal cells, anaerobic respiration produces <strong>lactic acid</strong> and a small amount of <strong>ATP</strong>. (Ethanol + CO₂ is the product in yeast/plants.) The answer here is ATP only — no CO₂ or ethanol."
+  },
+  {
+    topic: "Homeostasis",
+    q: "Which organ is primarily responsible for regulating blood glucose concentration?",
+    opts: ["Kidney","Liver","Pancreas","Stomach"],
+    ans: 2,
+    explain: "The <strong>pancreas</strong> secretes insulin (when blood glucose is too high) and glucagon (when it is too low), making it the key organ in blood glucose homeostasis."
+  },
+  {
+    topic: "Cell Division",
+    q: "Mitosis produces two daughter cells. How do they compare to the parent cell?",
+    opts: [
+      "Half the chromosome number (haploid)",
+      "Double the chromosome number (tetraploid)",
+      "Same chromosome number (diploid) and genetically identical",
+      "Same chromosome number but genetically different"
+    ],
+    ans: 2,
+    explain: "Mitosis is used for growth and repair. Both daughter cells are <strong>genetically identical diploid cells</strong> — they contain the same number and type of chromosomes as the parent cell."
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+const TOTAL      = 5;
+const PASS_MARK  = 4;
+
+let questions    = [];
+let current      = 0;
+let score        = 0;
+let selected     = null;
+let answered     = false;
+let qAttempts    = 0;
+
+/* shuffle & slice */
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - .5);
+}
+
+function init() {
+  questions = shuffle(BANK).slice(0, TOTAL);
+  current   = 0; score = 0; selected = null; answered = false; qAttempts = 0;
+  document.getElementById('quizBody').style.display    = 'block';
+  document.getElementById('resultScreen').classList.remove('show');
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════════════════ */
+function renderQuestion() {
+  const q = questions[current];
+  selected  = null;
+  answered  = false;
+  qAttempts = 0;
+
+  document.getElementById('qTopic').textContent   = q.topic.toUpperCase();
+  document.getElementById('qNumber').textContent  = `☰  Question ${current + 1} of ${TOTAL}`;
+  document.getElementById('qText').textContent    = q.q;
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('explanation').innerHTML = '';
+  document.getElementById('btnCheck').disabled    = true;
+  document.getElementById('btnNext').classList.remove('show');
+  document.getElementById('attemptsBadge').textContent = 'Question attempts: 0';
+
+  /* progress */
+  const pct = (current / TOTAL) * 100;
+  document.getElementById('progressFill').style.width  = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current+1} of ${TOTAL}`;
+  document.getElementById('scoreLabel').textContent    = `Score: ${score}`;
+
+  /* options */
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<span class="opt-letter">${letters[i]}</span><span class="opt-text">${opt}</span>`;
+    div.onclick   = () => selectOption(i);
+    list.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INTERACTION
+═══════════════════════════════════════════════════════════ */
+function selectOption(idx) {
+  if (answered) return;
+  selected = idx;
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('btnCheck').disabled = false;
+}
+
+function checkAnswer() {
+  if (selected === null || answered) return;
+  answered = true;
+  qAttempts++;
+  document.getElementById('attemptsBadge').textContent = `Question attempts: ${qAttempts}`;
+
+  const q    = questions[current];
+  const opts = document.querySelectorAll('.option');
+
+  opts.forEach((el, i) => {
+    el.classList.add('locked');
+    if (i === q.ans)    el.classList.add('correct');
+    if (i === selected && selected !== q.ans) el.classList.add('wrong');
+  });
+
+  if (selected === q.ans) score++;
+
+  /* explanation */
+  const expEl = document.getElementById('explanation');
+  expEl.innerHTML = (selected === q.ans
+    ? '🎋 <strong>Skadoosh!</strong> That is correct. '
+    : '🥋 Not quite, young panda. The correct answer was <strong>' + ['A','B','C','D'][q.ans] + '</strong>. ')
+    + q.explain;
+  expEl.classList.add('show');
+
+  document.getElementById('btnCheck').disabled = true;
+  document.getElementById('btnNext').classList.add('show');
+  document.getElementById('scoreLabel').textContent = `Score: ${score}`;
+
+  /* update progress fill to include current answered */
+  const pct = ((current + 1) / TOTAL) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < TOTAL) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESULT
+═══════════════════════════════════════════════════════════ */
+function showResult() {
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('quizBody').style.display   = 'none';
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalDenom').textContent = `/ ${TOTAL}`;
+
+  const passed = score >= PASS_MARK;
+  const rs     = document.getElementById('resultScreen');
+  const rt     = document.getElementById('resultTitle');
+  const rm     = document.getElementById('resultMsg');
+  const ra     = document.getElementById('resultActions');
+
+  if (passed) {
+    rt.innerHTML = 'The Dragon Warrior <span class="gold">Triumphs!</span>';
+    rm.textContent = score === TOTAL
+      ? 'A perfect score! Master Oogway himself would bow to your brilliance. The Jade Palace is yours.'
+      : `${score} out of ${TOTAL} — your knowledge of life's secrets is formidable. The gates open for you.`;
+    ra.innerHTML = `<a href="index.html" class="btn-unlock">Enter the Jade Palace →</a>`;
+  } else {
+    rt.innerHTML = 'Not Yet, <span class="gold">Young Panda</span>…';
+    rm.textContent = `${score} of ${TOTAL} correct. Master Shifu says: "Your potential is great — but potential means nothing without effort." Train harder and return.`;
+    ra.innerHTML = `<button class="btn-retry" onclick="init()">☯ Train Again</button>`;
+  }
+
+  rs.classList.add('show');
+}
+
+/* ── keyboard shortcut: Enter to check / next ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (!answered && selected !== null) checkAnswer();
+    else if (answered && current < TOTAL) nextQuestion();
+  }
+});
+
+/* start */
+init();
+</script>
+</body>
+</html>
